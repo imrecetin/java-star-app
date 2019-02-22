@@ -1,38 +1,44 @@
 package com.star;
 
-import junit.framework.Test;
+import static org.junit.Assert.*;
+import java.io.*;
+
+import org.junit.*;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
+public class AppTest extends TestCase {
+	private static final String EOL =System.getProperty("line.separator");
+    private PrintStream console;
+    private ByteArrayOutputStream bytes;
+    
+    @Before
+    public void setUp() {
+       bytes   = new ByteArrayOutputStream();
+       console = System.out;
+       System.setOut(new PrintStream(bytes));
     }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
+    @After
+    public void tearDown() {
+       System.setOut(console);
+    }
+    
+    @Test
+    public void testAbortWhenInsufficientArgumentsSupplied() {
+       App.main();
+       assertEquals(App.MSG_TOO_FEW_ARGUMENTS + EOL + App.USAGE + EOL, bytes.toString());
     }
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+    @Test
+    public void testAbortWhenTooManyArgumentsSupplied() {
+       App.main("a", "b", "c");
+       assertEquals(App.MSG_TOO_MANY_ARGUMENTS + EOL +App.USAGE + EOL, bytes.toString());
     }
+    
+    @Test
+    public void testAbortWhenPortNotInteger() {
+       App.main("abc");
+       assertEquals(App.MSG_MUST_BE_NUMBER + EOL + App.USAGE + EOL, bytes.toString());
+    }
+
 }
